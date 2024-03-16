@@ -16,8 +16,8 @@ fn main() {
     let height_input = input("Height for image: ");
 
     
-    let width = width_input.trim().parse::<i32>().expect("Error while converting to i32 in width variable");
-    let height = height_input.trim().parse::<i32>().expect("Error while converting to i32 in height variable");
+    let width = width_input.trim().parse::<u32>().expect("Error while converting to i32 in width variable");
+    let height = height_input.trim().parse::<u32>().expect("Error while converting to i32 in height variable");
 
     let mut my_matrix = vec![];
 
@@ -25,7 +25,7 @@ fn main() {
         let mut row_vec = vec![];
         for column in 0..width {
             let value_buffer = input(format!("Value for {row}x{column}: ").as_str());
-            let value = value_buffer.trim().parse::<i32>().expect("Error when parse stdin to value (value variable)");
+            let value = value_buffer.trim().parse::<u32>().expect("Error when parse stdin to value (value variable)");
             row_vec.push(value);
         }
         my_matrix.push(row_vec);
@@ -40,12 +40,22 @@ fn main() {
     }
 
     let new_filename = &filename.trim().to_string();
-    let new_file_extension = &file_extension.clone().trim().to_string();
+    let new_file_extension = &file_extension.trim().to_string();
 
     let new_file_path = format!("image_result/{new_filename}.{new_file_extension}");
     let path = Path::new(new_file_path.as_str());
     let mut test_file = fs::File::create(path).expect("Error when creating file");
-    test_file.write(b"P1\n").unwrap();
+    
+    if new_file_extension.to_lowercase() == "pbm"{
+        test_file.write(b"P1\n").unwrap();
+    }
+    else if new_file_extension.to_lowercase() == "pgm" {
+        test_file.write(b"P5\n").unwrap();
+
+        let gray_max_level = input("Gray level: ").trim().parse::<u8>().unwrap();
+        test_file.write(format!("{gray_max_level}").as_bytes()).unwrap();
+    }
+
     test_file.write(format!("{width} {height}").as_bytes()).unwrap();
     test_file.write(b"\n").unwrap();
     
